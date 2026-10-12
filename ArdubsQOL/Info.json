@@ -1,0 +1,10 @@
+{
+  "Id": "ArdubsQOL",
+  "DisplayName": "Ardub's QOL",
+  "Author": "The-Talik",
+  "Version": "0.9.2",
+  "ManagerVersion": "0.32.4",
+  "Requirements": [],
+  "AssemblyName": "ArdubsQOL.dll",
+  "EntryMethod": "ArdubsQOL.Main.Load"
+}
