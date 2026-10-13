@@ -18,7 +18,7 @@ internal static class RodCaseBlueprints
         if (ResourcesLibrary.TryGetBlueprint(AbilityGuid) != null) return;
         const string nameKey = "ArdubsQOL.Rods.Name";
         const string descriptionKey = "ArdubsQOL.Rods.Description";
-        LocalizationManager.CurrentPack.PutString(nameKey, "Rods");
+        LocalizationManager.CurrentPack.PutString(nameKey, "Rod Box");
         LocalizationManager.CurrentPack.PutString(descriptionKey,
             "Choose an ordinary metamagic rod from the shared party inventory without equipping it. " +
             "Charges from identical rods are pooled; lesser, regular, and greater rods remain separate. " +
@@ -48,6 +48,6 @@ internal static class RodCaseBlueprints
         };
         ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(AbilityGuid, button);
         button.OnEnable();
-        Main.ModEntry.Logger.Log("Registered the shared Rods menu blueprint.");
+        Main.ModEntry.Logger.Log("Registered the shared Rod Box menu blueprint.");
     }
 }

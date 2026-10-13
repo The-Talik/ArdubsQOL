@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>ArdubsQOL</AssemblyName>
     <RootNamespace>ArdubsQOL</RootNamespace>
-    <Version>0.9.4</Version>
+    <Version>0.9.5</Version>
     <Title>Ardub's QOL</Title>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
