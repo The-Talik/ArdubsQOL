@@ -13,6 +13,8 @@
     <Compile Include="../ArdubsQOL/NegativeLevelRecoveryRules.cs" Link="NegativeLevelRecoveryRules.cs" />
     <Compile Include="../ArdubsQOL/ShifterAspectRules.cs" Link="ShifterAspectRules.cs" />
     <Compile Include="../ArdubsQOL/RodPoolRules.cs" Link="RodPoolRules.cs" />
+    <Compile Include="../ArdubsQOL/RodIconPixels.cs" Link="RodIconPixels.cs" />
+    <Compile Include="../ArdubsQOL/RodIconLabelRules.cs" Link="RodIconLabelRules.cs" />
     <Compile Include="../ArdubsQOL/SuspensionLabelRules.cs" Link="SuspensionLabelRules.cs" />
     <Compile Include="../ArdubsQOL/QuickbarTooltipRules.cs" Link="QuickbarTooltipRules.cs" />
   </ItemGroup>

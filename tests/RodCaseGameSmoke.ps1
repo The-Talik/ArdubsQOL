@@ -1,5 +1,5 @@
 # Run with Windows PowerShell against the installed game's real assemblies.
-# This binds the rod patches in an isolated process; it does not start the game.
+# This binds rod mechanics and resolves the native UI hook without starting the game.
 param(
     [Parameter(Mandatory = $true)][string]$ManagedPath,
     [Parameter(Mandatory = $true)][string]$ModPath,
@@ -31,20 +31,37 @@ public static class RodCaseGameSmoke {
         // Loading all types checks the custom slot's overrides against the original,
         // non-publicized assembly the actual game uses.
         var types = mod.GetTypes();
+        var slotView = Assembly.LoadFrom(Path.Combine(managedPath, "Assembly-CSharp.dll"))
+            .GetType("Kingmaker.UI.MVVM._PCView.ActionBar.ActionBarBaseSlotView", true);
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        if (slotView.GetField("m_Icon", flags).FieldType.FullName != "UnityEngine.UI.Image"
+            || slotView.GetField("m_ResourceCount", flags).FieldType.FullName != "TMPro.TextMeshProUGUI")
+            throw new Exception("Rod label hook's native icon/font fields have changed.");
         var createProcessor = harmonyType.GetMethod("CreateClassProcessor");
         var count = 0;
+        var nativeTargets = 0;
         foreach (var type in types.Where(type => type.Name.StartsWith("RodCase") && type.IsDefined(attributeType, false))) {
             var processor = createProcessor.Invoke(harmony, new object[] { type });
             try { processor.GetType().GetMethod("Patch").Invoke(processor, null); }
             catch (TargetInvocationException exception) {
+                // SetIcon directly calls Unity engine methods. The desktop CLR
+                // cannot JIT that original body; only Unity can test its binding
+                // and rendering. Still fail on any other error or patch target.
+                if (type.Name == "RodCaseIconLabelPatch" && exception.ToString().Contains(
+                    "ECall methods must be packaged into a system module")) {
+                    nativeTargets++;
+                    Console.WriteLine("Rod label target and icon/font fields resolved; live binding/rendering requires Unity.");
+                    continue;
+                }
                 Console.Error.WriteLine("Failed binding " + type.Name + ": " + exception);
                 throw exception.InnerException ?? exception;
             }
             Console.WriteLine("Bound " + type.Name);
             count++;
         }
-        if (count != 11) throw new Exception("Expected 11 shared-rod patches, bound " + count + ".");
-        Console.WriteLine("Shared Rods patches bind successfully against the installed game.");
+        if (count != 12 || nativeTargets != 1)
+            throw new Exception("Expected 12 bound shared-rod patches and 1 resolved Unity label target.");
+        Console.WriteLine("Rod mechanics and label cleanup bind; native label rendering awaits an in-game check.");
     }
     public static bool IsOrdinary(string name) {
         return (bool)mod.GetType("ArdubsQOL.RodPoolRules", true)

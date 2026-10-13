@@ -3,6 +3,13 @@ using System.Collections.Generic;
 
 namespace ArdubsQOL;
 
+internal enum RodGrade
+{
+    Lesser,
+    Regular,
+    Greater
+}
+
 internal static class RodPoolRules
 {
     private static readonly string[] Grades = { "Lesser", "Normal", "Greater" };
@@ -12,13 +19,21 @@ internal static class RodPoolRules
         "Quicken", "Reach", "Selective", "Intensified", "Piercing"
     };
 
-    internal static bool IsOrdinaryRod(string? toggleName)
+    internal static bool IsOrdinaryRod(string? toggleName) =>
+        TryGetIconLabel(toggleName, out _, out _);
+
+    internal static bool TryGetIconLabel(string? toggleName, out string label, out RodGrade grade)
     {
+        label = string.Empty;
+        grade = RodGrade.Regular;
         if (toggleName == null) return false;
-        foreach (var grade in Grades)
+        for (var gradeIndex = 0; gradeIndex < Grades.Length; gradeIndex++)
         foreach (var metamagic in Metamagics)
         {
-            if (toggleName == $"MetamagicRod{grade}{metamagic}ToggleAbility") return true;
+            if (toggleName != $"MetamagicRod{Grades[gradeIndex]}{metamagic}ToggleAbility") continue;
+            label = metamagic;
+            grade = (RodGrade)gradeIndex;
+            return true;
         }
         return false;
     }

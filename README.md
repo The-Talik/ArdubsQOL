@@ -1,11 +1,11 @@
 # Ardub's QOL
 
-Ardub's QOL is a collection of focused quality-of-life options for
+Ardub's QOL is a collection of quality-of-life options for
 **Pathfinder: Wrath of the Righteous** fixing things that annoyed me.
 
 ## Features
 
-- Chant and Cackle auras (Turn-based only).
+- Chant and Cackle auras. (Turn-based only) (Inspired from DarkCodex's version)
 - A Rods submenu in Abilities that pools all metamagic rods.  (Inspired from The One Pearl)
 - Shifter Aspect now retains the remaining minute buff when you turn it off.
 - Automatic pausing after a save finishes loading.
@@ -15,7 +15,7 @@ Ardub's QOL is a collection of focused quality-of-life options for
 - Duration remaining on effects in the hover infowindow
 - Hover text and gold target outlines for Accursed Hex
   retries. (Requires Tabletop Tweaks)
-- An optional rule (default to off) that removes one negative level after a level-up.
+- An optional rule (default to off) that removes one negative level per level-up.
 
 ## Requirements
 
@@ -28,7 +28,7 @@ implementation is present. All other features work without Tabletop Tweaks.
 ## Installation
 
 1. Install Unity Mod Manager for Pathfinder: Wrath of the Righteous
-2. Install the mod using Unity Mod Manger, or Modfinder(I recommend this).
+2. Install the mod using Unity Mod Manger, or Modfinder (I recommend this).
 3. Start the game!
 
 ## Save compatibility and uninstalling
@@ -37,10 +37,9 @@ Most options change only runtime behavior and add no custom save data.
 
 The Chant/Cackle Aura abilities and marker buffs, and the Rods menu ability,
 are exceptions: their native ability facts and action-bar placements are saved
-so quickbar placement survives loading. Rod selections and pools add no custom
-saved state. Saves containing these ability blueprints require Ardub's QOL.
+so quickbar placement survives loading. Saves containing these ability blueprints require Ardub's QOL.
 
-To prepare a campaign for uninstalling the mod:
+To uninstalling the mod:
 
 1. Turn off **Enable Chant Aura** and **Shared Rods Menu** in the mod settings.
 2. Let the mod remove their abilities and quickbar entries.
@@ -50,7 +49,7 @@ To prepare a campaign for uninstalling the mod:
 ## Compatibility notes
 
 - DarkCodex is not required. If DarkCodex's separate passive Chant/Cackle
-  feature is enabled, disable it while using or testing this implementation so
+  feature is enabled, disable it while using this implementation so
   the two systems do not overlap.
 - Tabletop Tweaks Core is optional. Only the Accursed Hex presentation uses it.
 - Chant Aura and Cackle Aura are supported only in turn-based combat.
@@ -60,8 +59,3 @@ To prepare a campaign for uninstalling the mod:
 
 Ardub's QOL's original code and documentation are available under the
 [MIT License](LICENSE), copyright 2026 The-Talik.
-
-This license does not grant rights to Pathfinder: Wrath of the Righteous,
-Owlcat Games assets or trademarks, Unity Mod Manager, Tabletop Tweaks,
-DarkCodex, or other third-party material. Those remain subject to their
-respective owners and licenses.

@@ -157,5 +157,6 @@ Assert(
     "A level-up callback without a character-level increase must not trigger recovery.");
 
 RodPoolPolicyTests.Run();
+RodIconPolicyTests.Run();
 QuickbarTooltipPolicyTests.Run();
 Console.WriteLine("Ardub's QOL policy tests passed.");

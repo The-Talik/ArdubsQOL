@@ -24,7 +24,8 @@ internal sealed class RodPool
         Mechanics = mechanics;
         Name = item.Name;
         Description = item.Description;
-        Icon = item.Icon ?? toggle.Icon;
+        // Frame only the shared-menu sprite; its label is native UI text, not image pixels.
+        Icon = RodIconFactory.WithGradeBorder(item.Icon ?? toggle.Icon, toggle.name)!;
     }
 
     internal BlueprintActivatableAbility Toggle { get; }

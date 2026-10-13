@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>ArdubsQOL</AssemblyName>
     <RootNamespace>ArdubsQOL</RootNamespace>
-    <Version>0.9.2</Version>
+    <Version>0.9.4</Version>
     <Title>Ardub's QOL</Title>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
@@ -19,6 +19,7 @@
     <Reference Include="$(WrathInstallDir)/Wrath_Data/Managed/UnityEngine.TextRenderingModule.dll" Private="false" />
     <Reference Include="$(WrathInstallDir)/Wrath_Data/Managed/UnityEngine.UIModule.dll" Private="false" />
     <Reference Include="$(WrathInstallDir)/Wrath_Data/Managed/UnityEngine.UI.dll" Private="false" />
+    <Reference Include="$(WrathInstallDir)/Wrath_Data/Managed/Unity.TextMeshPro.dll" Private="false" />
     <Reference Include="$(WrathInstallDir)/Wrath_Data/Managed/Owlcat.Runtime.UI.dll" Private="false" />
     <Reference Include="$(WrathInstallDir)/Wrath_Data/Managed/Owlcat.Runtime.Core.dll" Private="false" />
     <Reference Include="$(WrathInstallDir)/Wrath_Data/Managed/Owlcat.Runtime.Visual.dll" Private="false" />
