@@ -24,6 +24,7 @@ public static class Main
                 TransientAuraManager.Update();
                 FreezeManager.Update();
                 SilentRangeIndicator.Update();
+                AuraHoverPreview.Update();
                 AccursedHexIntegration.UpdateHighlights();
                 RodCase.Update();
             };

@@ -1,0 +1,36 @@
+[
+    {
+        "Name": "Ardub's Enemy Intelligence",
+        "Author": "The-Talik",
+        "Id": {
+            "Id": "ArdubsEnemyIntelligence",
+            "Type": "UMM"
+        },
+        "Service": {
+            "GitHub": {
+                "Owner": "The-Talik",
+                "RepoName": "ArdubsEnemyIntelligence"
+            }
+        },
+        "About": "Improves enemy target selection and body-blocking in turn-based combat, with configurable tactical behavior.",
+        "HomepageUrl": "https://github.com/The-Talik/ArdubsEnemyIntelligence",
+        "Tags": [ "Gameplay", "Bugfix" ]
+    },
+    {
+        "Name": "Ardub's QOL",
+        "Author": "The-Talik",
+        "Id": {
+            "Id": "ArdubsQOL",
+            "Type": "UMM"
+        },
+        "Service": {
+            "GitHub": {
+                "Owner": "The-Talik",
+                "RepoName": "ArdubsQOL"
+            }
+        },
+        "About": "Chant/Cackle auras, pooled metamagic rods, save-load pausing, hover-inspector improvements, and other optional fixes.",
+        "HomepageUrl": "https://github.com/The-Talik/ArdubsQOL",
+        "Tags": [ "Bugfix", "Gameplay", "UserInterface", "Utilities" ]
+    }
+]

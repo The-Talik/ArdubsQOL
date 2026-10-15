@@ -82,6 +82,24 @@ internal static class FreezeManager
 
     internal static bool HasSuspendedBuffs => Frozen.Count > 0;
 
+    internal static bool WouldSuspendTarget(ActivatableAbility aura, UnitEntityData target)
+    {
+        var caster = aura.Owner.Unit;
+        var eligible = Blueprints.IsChantAura(aura) ? ChantEligibleBuffs : CackleEligibleBuffs;
+        var now = Game.Instance.TimeController.GameTime;
+        // Read-only preview: it does not require the aura to be on, extend a
+        // timer, or revive an expired hex. Reuse the actual sustaining range.
+        return target.Buffs.RawFacts.Any(buff => AuraHoverPreviewRules.CanHighlightBuff(
+                buff.Manager != null,
+                buff.IsPermanent,
+                eligible.Contains(buff.Blueprint.AssetGuid),
+                buff.Context?.MaybeCaster == caster,
+                buff.EndTime,
+                now,
+                Frozen.TryGetValue(buff, out var timer) ? timer.Remaining : TimeSpan.Zero))
+            && IsWithinRange(target, caster);
+    }
+
     internal static AuraSuspensionKind GetSuspensionKind(Buff buff)
     {
         if (buff == null || !Frozen.ContainsKey(buff))
