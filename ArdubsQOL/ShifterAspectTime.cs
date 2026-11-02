@@ -15,7 +15,7 @@ internal static class ShifterAspectTime
 
     [HarmonyPatch(typeof(ActivatableAbility), "OnDidTurnOff")]
     [HarmonyPrefix]
-    private static void PreservePaidInterval(
+    internal static void PreservePaidInterval(
         ActivatableAbility __instance,
         ref Buff? ___m_AppliedBuff)
     {
@@ -41,18 +41,23 @@ internal static class ShifterAspectTime
                 return;
             }
 
-            buff.EndTime = paidIntervalEnd.Value;
-            buff.NextResourceSpendingTime = TimeSpan.MaxValue;
-            buff.Owner.Unit.Buffs.UpdateNextEvent();
-
-            // The activatable can now stop without removing the prepaid base-game buff.
-            ___m_AppliedBuff = null;
+            PreserveBuffUntil(ref ___m_AppliedBuff, paidIntervalEnd.Value);
             _errorReported = false;
         }
         catch (Exception exception)
         {
             ReportError("Could not preserve the remaining Shifter Aspect interval", exception);
         }
+    }
+
+    internal static void PreserveBuffUntil(ref Buff? appliedBuff, TimeSpan end)
+    {
+        if (appliedBuff == null) return;
+        appliedBuff.EndTime = end;
+        appliedBuff.NextResourceSpendingTime = TimeSpan.MaxValue;
+        appliedBuff.Owner.Unit.Buffs.UpdateNextEvent();
+        // The activatable can stop without removing the prepaid base-game buff.
+        appliedBuff = null;
     }
 
     [HarmonyPatch(typeof(ActivatableAbility), "OnDidTurnOn")]

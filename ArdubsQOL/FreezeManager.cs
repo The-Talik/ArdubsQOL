@@ -47,6 +47,7 @@ internal static class FreezeManager
     private static int _generation;
     private static bool _errorReported;
     private static bool _updating;
+    private static TimeSpan _lastPreparedTick = TimeSpan.MinValue;
 
     internal static void Update()
     {
@@ -81,6 +82,24 @@ internal static class FreezeManager
     }
 
     internal static bool HasSuspendedBuffs => Frozen.Count > 0;
+
+    internal static void BeforeBuffTick(TimeSpan? deltaTimeForRest)
+    {
+        if (_updating || deltaTimeForRest.HasValue || !HasSuspendedBuffs
+            || CombatController.IsInTurnBasedCombat())
+        {
+            return;
+        }
+
+        var now = Game.Instance.TimeController.GameTime;
+        if (_lastPreparedTick != now)
+        {
+            _lastPreparedTick = now;
+            // Refresh once per game-time tick, before native expiry checks. This
+            // avoids a short hex expiring between the game's tick and UMM Update.
+            UpdateNow();
+        }
+    }
 
     internal static bool WouldSuspendTarget(ActivatableAbility aura, UnitEntityData target)
     {
@@ -149,7 +168,7 @@ internal static class FreezeManager
     private static void UpdateCore()
     {
         var game = Game.Instance;
-        if (game?.Player == null)
+        if (game?.Player == null || game.IsLoadingSave)
         {
             return;
         }
@@ -161,9 +180,7 @@ internal static class FreezeManager
             return;
         }
 
-        if (game.State?.Units == null
-            || !CombatController.IsInTurnBasedCombat()
-            || !game.Player.IsInCombat)
+        if (game.State?.Units == null || game.CurrentlyLoadedArea?.IsGlobalMap == true)
         {
             ResumeAll(now);
             return;
@@ -328,7 +345,7 @@ internal static class FreezeManager
     private static bool HasAnyActiveAura(UnitEntityData caster)
     {
         return caster != null
-            && caster.IsInCombat
+            && caster.IsInGame
             && caster.ActivatableAbilities.RawFacts.Any(
                 ability => Blueprints.IsAura(ability) && ability.IsOn && ability.IsStarted);
     }
@@ -336,7 +353,7 @@ internal static class FreezeManager
     private static bool HasActiveAuraForBuff(UnitEntityData caster, BlueprintGuid buffGuid)
     {
         return caster != null
-            && caster.IsInCombat
+            && caster.IsInGame
             && caster.ActivatableAbilities.RawFacts.Any(
                 ability => ability.IsOn
                     && ability.IsStarted
@@ -359,5 +376,14 @@ internal static class BuffAttachedPatch
     private static void Postfix(Buff fact)
     {
         FreezeManager.TryFreezeImmediately(fact);
+    }
+}
+
+[HarmonyPatch(typeof(BuffCollection), nameof(BuffCollection.Tick))]
+internal static class AuraBeforeBuffTickPatch
+{
+    private static void Prefix(TimeSpan? deltaTimeForRest)
+    {
+        FreezeManager.BeforeBuffTick(deltaTimeForRest);
     }
 }

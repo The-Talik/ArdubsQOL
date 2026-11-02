@@ -89,7 +89,8 @@ internal static class Blueprints
         PutString(
             descriptionKey,
             $"{displayNameText} suspends the countdown of select hexes within 30 feet. " +
-            "Maintaining the aura uses the character's move action.");
+            "Maintaining the aura uses the character's move action in turn-based combat. " +
+            "In real time and outside combat, it limits the character's speed to 5 feet.");
 
         var displayName = new LocalizedString { Key = nameKey };
         var description = new LocalizedString { Key = descriptionKey };
@@ -124,8 +125,8 @@ internal static class Blueprints
             ActivationType = AbilityActivationType.Immediately,
             DeactivateImmediately = true,
             IsOnByDefault = false,
-            OnlyInCombat = true,
-            DeactivateIfCombatEnded = true,
+            OnlyInCombat = false,
+            DeactivateIfCombatEnded = false,
             DeactivateIfOwnerDisabled = true,
             DeactivateIfOwnerUnconscious = true,
             DoNotTurnOffOnRest = false,

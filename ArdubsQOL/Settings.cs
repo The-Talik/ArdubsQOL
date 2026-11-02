@@ -13,22 +13,38 @@ public sealed class Settings : UnityModManager.ModSettings
     private const float InspectorSliderWidth = 90f;
 
     private const string ChantAuraLabel = "Enable Chant Aura (Default On)";
+    private const string StopChantAurasLabel = "Stop Chant Auras After Combat (Default On)";
     private const string ShifterAspectLabel = "Preserve Shifter Aspect Time (Default On)";
+    private const string StopShifterAspectsLabel = "Stop Shifter Aspects After Combat (Default On)";
     private const string PauseOnLoadLabel = "Pause at Savegame Load (Default On)";
+    private const string OutpostLoadingLabel = "Faster Outpost Loading (Default On)";
+    private const string OutpostSwitcherLabel = "Outpost Switcher (Default On)";
+    private const string InfirmaryPreviewLabel = "Infirmary Healing Preview (Default On)";
+    private const string InfirmaryBreakdownLabel = "Infirmary Unit Breakdown (Default On)";
     private const string SideTooltipsLabel = "Side Quickbar Tooltips (Default On)";
     private const string DebuffCastersLabel = "Show Stackable Debuff Casters (Default On)";
     private const string HexRetriesLabel = "Show Accursed Hex Retries (Default On)";
     private const string RodCaseLabel = "Shared Rods Menu (Default On)";
     private const string NegativeLevelLabel = "Remove Negative Level on Level Up (Default Off)";
+    private const string RepurposedControlLabel = "Control Repurposed Monsters (Default Off)";
+    private const string EvilEyeStackingLabel = "Limit Evil Eye Stacking (Default Off)";
     private const string DiagnosticsLabel = "Detailed Diagnostics (Default Off)";
     private static readonly string[] PlacementChoices = { "Auto", "Left", "Right" };
 
     public bool EnableChantAura = true;
+    public bool StopChantAurasAfterCombat = true;
     public bool PreserveShifterAspectTime = true;
+    public bool StopShifterAspectsAfterCombat = true;
     public bool PauseAtSavegameLoad = true;
+    public bool FasterOutpostLoading = true;
+    public bool EnableOutpostSwitcher = true;
+    public bool ShowInfirmaryHealingPreview = true;
+    public bool ShowInfirmaryUnitBreakdown = true;
     public bool EnableSideQuickbarTooltips = true;
     public QuickbarTooltipSide QuickbarTooltipPlacement = QuickbarTooltipSide.Auto;
     public bool RemoveNegativeLevelOnLevelUp;
+    public bool ControlRepurposedMonsters;
+    public bool LimitEvilEyeStacking;
     public bool EnableRodCase = true;
     public float HoverInspectorFontScale = 1f;
     public bool ShowStackableDebuffCasters = true;
@@ -64,8 +80,8 @@ public sealed class Settings : UnityModManager.ModSettings
             inspectorLabelWidth + InspectorSliderWidth + percentageWidth + OptionColumnGap * 2f + 24f);
         foreach (var name in new[]
         {
-            ChantAuraLabel, ShifterAspectLabel, PauseOnLoadLabel, SideTooltipsLabel,
-            DebuffCastersLabel, HexRetriesLabel, RodCaseLabel, NegativeLevelLabel, DiagnosticsLabel
+            ChantAuraLabel, StopChantAurasLabel, ShifterAspectLabel, StopShifterAspectsLabel, PauseOnLoadLabel, OutpostLoadingLabel, OutpostSwitcherLabel, InfirmaryPreviewLabel, InfirmaryBreakdownLabel, SideTooltipsLabel,
+            DebuffCastersLabel, HexRetriesLabel, RodCaseLabel, NegativeLevelLabel, RepurposedControlLabel, EvilEyeStackingLabel, DiagnosticsLabel
         })
         {
             optionColumnWidth = Mathf.Max(optionColumnWidth, MeasureWidth(GUI.skin.toggle, name));
@@ -76,17 +92,47 @@ public sealed class Settings : UnityModManager.ModSettings
             EnableChantAura = DrawToggleRow(
                 EnableChantAura,
                 ChantAuraLabel,
-                "Adds 30-foot Chant and Cackle auras that freeze eligible hex timers in turn-based combat.",
+                "Adds 30-foot hex-sustaining auras; costs a move action in turn-based combat or caps speed at 5 feet otherwise.",
+                descriptionStyle, optionColumnWidth);
+            StopChantAurasAfterCombat = DrawToggleRow(
+                StopChantAurasAfterCombat,
+                StopChantAurasLabel,
+                "Automatically turns off Chant and Cackle auras when the party leaves combat.",
                 descriptionStyle, optionColumnWidth);
             PreserveShifterAspectTime = DrawToggleRow(
                 PreserveShifterAspectTime,
                 ShifterAspectLabel,
                 "Keeps a paid Shifter Aspect buff active until its current one-minute interval expires.",
                 descriptionStyle, optionColumnWidth);
+            StopShifterAspectsAfterCombat = DrawToggleRow(
+                StopShifterAspectsAfterCombat,
+                StopShifterAspectsLabel,
+                "Stops main Shifter Aspect toggles after combat without clearing Chimeric selections; preserves paid time when enabled.",
+                descriptionStyle, optionColumnWidth);
             PauseAtSavegameLoad = DrawToggleRow(
                 PauseAtSavegameLoad,
                 PauseOnLoadLabel,
                 "Pauses the game when a loaded save and its destination area are ready.",
+                descriptionStyle, optionColumnWidth);
+            FasterOutpostLoading = DrawToggleRow(
+                FasterOutpostLoading,
+                OutpostLoadingLabel,
+                "Defers heavy asset cleanup during outpost construction visits until a normal area/save/menu load; uses more memory in the meantime.",
+                descriptionStyle, optionColumnWidth);
+            EnableOutpostSwitcher = DrawToggleRow(
+                EnableOutpostSwitcher,
+                OutpostSwitcherLabel,
+                "Adds previous/next buttons and a settlement dropdown to the construction screen, skipping the return trip to the map.",
+                descriptionStyle, optionColumnWidth);
+            ShowInfirmaryHealingPreview = DrawToggleRow(
+                ShowInfirmaryHealingPreview,
+                InfirmaryPreviewLabel,
+                "Shows the infirmary-point value of revived troops alongside HP and unit counts in crusade healing previews.",
+                descriptionStyle, optionColumnWidth);
+            ShowInfirmaryUnitBreakdown = DrawToggleRow(
+                ShowInfirmaryUnitBreakdown,
+                InfirmaryBreakdownLabel,
+                "Adds per-unit recovery costs to infirmary tooltips, including current casualties and recoverable counts during battle.",
                 descriptionStyle, optionColumnWidth);
 
             EnableSideQuickbarTooltips = DrawToggleRow(
@@ -140,12 +186,22 @@ public sealed class Settings : UnityModManager.ModSettings
             ShowAccursedHexRetries = DrawToggleRow(
                 ShowAccursedHexRetries,
                 HexRetriesLabel,
-                "Shows Tabletop Tweaks Accursed Hex retries in the hover inspector and outlines matching targets in gold while selecting the hex.",
+                "Shows Tabletop Tweaks Accursed Hex retries in the hover inspector and marks matching targets with gold outlines and ground circles while selecting the hex.",
                 descriptionStyle, optionColumnWidth);
         }, headingStyle, headingWidth);
 
         DrawSection("Gameplay Changes", () =>
         {
+            LimitEvilEyeStacking = DrawToggleRow(
+                LimitEvilEyeStacking,
+                EvilEyeStackingLabel,
+                "Applies only the strongest witch or shaman Evil Eye penalty per statistic, preserving each caster's duration and Chant/Cackle upkeep.",
+                descriptionStyle, optionColumnWidth);
+            ControlRepurposedMonsters = DrawToggleRow(
+                ControlRepurposedMonsters,
+                RepurposedControlLabel,
+                "Lets you directly control monsters raised by a party member's Repurpose without changing their summon status or lifespan.",
+                descriptionStyle, optionColumnWidth);
             EnableRodCase = DrawToggleRow(
                 EnableRodCase,
                 RodCaseLabel,
@@ -163,7 +219,7 @@ public sealed class Settings : UnityModManager.ModSettings
             DetailedLogging = DrawToggleRow(
                 DetailedLogging,
                 DiagnosticsLabel,
-                "Writes detailed aura, shared rod charge, and negative-level recovery diagnostics to the UMM log.",
+                "Writes detailed aura, Shifter Aspect, outpost loading, shared rod charge, and negative-level recovery diagnostics to the UMM log.",
                 descriptionStyle, optionColumnWidth);
         }, headingStyle, headingWidth);
     }

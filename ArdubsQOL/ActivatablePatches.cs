@@ -117,25 +117,6 @@ internal static class ActivatablePatches
         }
     }
 
-    [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.HandleUnitLeaveCombat))]
-    [HarmonyPostfix]
-    private static void TurnOffWhenCombatEnds(ActivatableAbility __instance, UnitEntityData unit)
-    {
-        if (!Blueprints.IsAura(__instance) || unit != __instance.Owner.Unit)
-        {
-            return;
-        }
-
-        if (__instance.IsOn)
-        {
-            __instance.IsOn = false;
-        }
-        else if (__instance.IsStarted)
-        {
-            __instance.Stop(forceRemovedBuff: true);
-        }
-    }
-
     [HarmonyPatch(typeof(TurnController), "CalculatePredictionForActivatableAbilities")]
     [HarmonyPostfix]
     private static void ShowMoveActionReservation(TurnController __instance)

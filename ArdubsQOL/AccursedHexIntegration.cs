@@ -79,11 +79,12 @@ internal static class AccursedHexIntegration
                 if (!active.Contains(pair.Key) || pair.Key.View == null ||
                     !ReferenceEquals(pair.Value.Highlighter, pair.Key.View.m_Highlighter))
                     RemoveOutline(pair.Key, pair.Value);
+            AccursedHexGroundCircle.Update(active);
         }
         catch (Exception exception)
         {
             ClearOutlines();
-            WarnOnce("Could not update Accursed Hex target outlines: " + exception);
+            WarnOnce("Could not update Accursed Hex target highlights: " + exception);
         }
     }
 
@@ -194,6 +195,7 @@ internal static class AccursedHexIntegration
     private static void ClearOutlines()
     {
         foreach (var pair in Outlines.ToArray()) RemoveOutline(pair.Key, pair.Value);
+        AccursedHexGroundCircle.Clear();
     }
 
     private static void WarnOnce(string message)

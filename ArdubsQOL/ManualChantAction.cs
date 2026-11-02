@@ -4,7 +4,6 @@ using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Commands.Base;
-using TurnBased.Controllers;
 
 namespace ArdubsQOL;
 
@@ -27,7 +26,6 @@ internal static class ManualChantAction
 
         return ActionRules.ShouldUseStandardActionForManualChant(
             Main.Settings.EnableChantAura,
-            CombatController.IsInTurnBasedCombat(),
             matchingAuraActive);
     }
 

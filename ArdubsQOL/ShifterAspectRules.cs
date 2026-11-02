@@ -4,6 +4,9 @@ namespace ArdubsQOL;
 
 internal static class ShifterAspectRules
 {
+    internal static bool ShouldStopAfterCombat(bool isShifterAspect, bool isOn, bool isStarted) =>
+        isShifterAspect && (isOn || isStarted);
+
     internal static TimeSpan? GetPaidIntervalEnd(
         bool enabled,
         bool isShifterAspect,

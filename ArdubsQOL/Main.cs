@@ -22,14 +22,18 @@ public static class Main
             modEntry.OnUpdate = (_, _) =>
             {
                 TransientAuraManager.Update();
+                ActionEconomy.Update();
                 FreezeManager.Update();
                 SilentRangeIndicator.Update();
                 AuraHoverPreview.Update();
                 AccursedHexIntegration.UpdateHighlights();
                 RodCase.Update();
+                OutpostNavigation.Update();
+                EvilEyeStacking.Update();
             };
 
             new Harmony(modEntry.Info.Id).PatchAll(Assembly.GetExecutingAssembly());
+            CombatEndOptions.Initialize();
             modEntry.Logger.Log("Ardub's QOL loaded.");
             return true;
         }

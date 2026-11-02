@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.GameModes;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Commands.Base;
 using TurnBased.Controllers;
@@ -17,6 +19,70 @@ internal static class ActionEconomy
     }
 
     private static readonly ConditionalWeakTable<ActivatableAbility, Reservation> Reservations = new();
+    private static bool _errorReported;
+
+    internal static void Update()
+    {
+        var game = Game.Instance;
+        var player = game?.Player;
+        if (game == null || player == null || game.IsLoadingSave
+            || game.CurrentMode == GameModeType.Cutscene || !Main.Settings.EnableChantAura)
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (var unit in player.AllCharacters.ToArray())
+            {
+                if (unit?.ActivatableAbilities == null)
+                {
+                    continue;
+                }
+
+                foreach (var aura in unit.ActivatableAbilities.RawFacts
+                             .Where(aura => Blueprints.IsAura(aura) && aura.IsOn && aura.IsStarted).ToArray())
+                {
+                    // World-map travel has no unit movement speed, so it cannot
+                    // pay the real-time upkeep cost. Rest uses native cleanup.
+                    if (game.CurrentlyLoadedArea?.IsGlobalMap == true)
+                    {
+                        aura.IsOn = false;
+                        continue;
+                    }
+
+                    if (!AuraMovement.UsesTurnBasedActions(unit))
+                    {
+                        Reservations.Remove(aura);
+                    }
+                    // Native OnNewRound remains responsible for normal TB turns.
+                    // Only initialize missing reservations after turn preparation;
+                    // Prepare clears cooldowns, including when a delayed turn resumes.
+                    else if (!Reservations.TryGetValue(aura, out _)
+                        && unit.IsCurrentUnit()
+                        && Game.Instance.TurnBasedCombatController.CurrentTurn is { } turn
+                        && (turn.Status == TurnController.TurnStatus.Preparing || turn.IsActing)
+                        && !ReserveOnNewRound(aura))
+                    {
+                        aura.IsOn = false;
+                        continue;
+                    }
+
+                    SilentRangeIndicator.Show(aura);
+                }
+            }
+
+            _errorReported = false;
+        }
+        catch (Exception exception)
+        {
+            if (!_errorReported)
+            {
+                _errorReported = true;
+                Main.ModEntry.Logger.Error($"Could not synchronize Chant/Cackle Aura action costs; it will retry: {exception}");
+            }
+        }
+    }
 
     internal static bool CanActivate(UnitEntityData unit)
     {
@@ -25,6 +91,32 @@ internal static class ActionEconomy
             unit.IsInCombat,
             unit.IsCurrentUnit(),
             unit.UsedOneMoveAction());
+    }
+
+    internal static bool CanDelayWithReservation(TurnController turn, UnitEntityData? unit)
+    {
+        var controller = Game.Instance?.TurnBasedCombatController;
+        if (Main.Settings?.EnableChantAura != true || unit?.ActivatableAbilities == null
+            || !ReferenceEquals(controller?.CurrentTurn, turn) || !AuraMovement.UsesTurnBasedActions(unit))
+        {
+            return false;
+        }
+
+        var reserved = unit.ActivatableAbilities.RawFacts.Any(aura =>
+            Blueprints.IsAura(aura) && aura.IsOn && aura.IsStarted
+            && Reservations.TryGetValue(aura, out var reservation)
+            && ActionRules.ReservationAlreadyCoversTurn(
+                reservation.Reserved, reservation.TurnStartTime, controller!.TurnStartTime));
+        var cooldown = turn.GetCooldown(unit);
+        return ActionRules.CanDelayWithAuraReservation(
+            reserved, turn.GetTimeMoved(unit), cooldown.StandardAction, cooldown.MoveAction, cooldown.SwiftAction);
+    }
+
+    internal static void ForgetDelayedReservations(UnitEntityData? unit)
+    {
+        if (unit?.ActivatableAbilities == null) return;
+        foreach (var aura in unit.ActivatableAbilities.RawFacts.Where(Blueprints.IsAura))
+            Reservations.Remove(aura);
     }
 
     internal static string DescribeAvailability(UnitEntityData unit)
@@ -41,11 +133,29 @@ internal static class ActionEconomy
             return false;
         }
 
+        if (!AuraMovement.UsesTurnBasedActions(ability.Owner.Unit))
+        {
+            Reservations.Remove(ability);
+            return true;
+        }
+
         return Reserve(ability);
     }
 
     internal static bool ReserveOnNewRound(ActivatableAbility ability)
     {
+        var unit = ability.Owner.Unit;
+        if (!AuraMovement.UsesTurnBasedActions(unit))
+        {
+            Reservations.Remove(ability);
+            return true;
+        }
+
+        if (!unit.IsCurrentUnit())
+        {
+            return true;
+        }
+
         var reservation = Reservations.GetOrCreateValue(ability);
         var turnStartTime = Game.Instance?.TurnBasedCombatController?.TurnStartTime ?? TimeSpan.Zero;
 
@@ -57,9 +167,6 @@ internal static class ActionEconomy
                 reservation.TurnStartTime,
                 turnStartTime))
         {
-            Main.LogDetail(
-                $"Kept the existing move reservation for {ability.Blueprint.name} " +
-                "during its same-turn initial round callback.");
             return true;
         }
 

@@ -12,7 +12,7 @@ internal static class ActionRules
         bool ownTurn,
         bool usedOneMoveAction)
     {
-        return turnBased && inCombat && ownTurn && !usedOneMoveAction;
+        return !turnBased || !inCombat || (ownTurn && !usedOneMoveAction);
     }
 
     internal static bool ReservationAlreadyCoversTurn(
@@ -21,6 +21,21 @@ internal static class ActionRules
         TimeSpan currentTurnStart)
     {
         return reserved && reservedTurnStart == currentTurnStart;
+    }
+
+    internal static bool CanDelayWithAuraReservation(
+        bool reservedThisTurn,
+        float timeMoved,
+        float standardActionCooldown,
+        float moveActionCooldown,
+        float swiftActionCooldown)
+    {
+        return reservedThisTurn
+            && timeMoved <= 0f
+            && standardActionCooldown <= 0f
+            && swiftActionCooldown <= 0f
+            && moveActionCooldown >= 0f
+            && moveActionCooldown <= MoveActionCooldown;
     }
 
     internal static float ReleaseMoveCooldown(float currentCooldown, bool reservedByAura)
@@ -35,10 +50,9 @@ internal static class ActionRules
 
     internal static bool ShouldUseStandardActionForManualChant(
         bool featureEnabled,
-        bool turnBased,
         bool matchingAuraActive)
     {
-        return featureEnabled && turnBased && matchingAuraActive;
+        return featureEnabled && matchingAuraActive;
     }
 
     internal static TimeSpan PreserveExternalDurationExtension(
