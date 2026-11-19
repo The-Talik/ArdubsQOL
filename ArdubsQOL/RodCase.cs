@@ -211,18 +211,7 @@ internal static class RodCase
             foreach (var unit in player.AllCharacters.ToArray())
             {
                 if (unit?.Facts == null) continue;
-                var facts = unit.Abilities.RawFacts.Where(fact => fact.Blueprint == button).ToArray();
-                if (Main.Settings.EnableRodCase && HasSpellList(unit))
-                {
-                    if (facts.Length == 0) unit.Facts.Add(new Ability(button, unit.Descriptor));
-                    foreach (var duplicate in facts.Skip(1)) unit.Facts.Remove(duplicate);
-                }
-                else
-                {
-                    ClearSelection(unit);
-                    foreach (var fact in facts) unit.Facts.Remove(fact);
-                    RemoveButtonSlots(unit);
-                }
+                ReconcileButton(unit, button, Main.Settings.EnableRodCase && HasSpellList(unit));
             }
             foreach (var unit in Selections.Keys.ToArray())
             {
@@ -240,6 +229,37 @@ internal static class RodCase
         }
     }
 
+    private static void ReconcileButton(UnitEntityData unit, BlueprintAbility button, bool enabled)
+    {
+        var facts = unit.Abilities.RawFacts.Where(fact => fact.Blueprint == button).ToArray();
+        if (enabled)
+        {
+            // Earlier versions could leave a native quickbar-retained fact
+            // disabled. Reattaching it uses the game's normal restoration path
+            // and raises the ability-added event that refreshes the menu.
+            if (facts.Length == 0 || facts[0].Data.TemporarilyDisabled)
+            {
+                unit.Facts.Add(new Ability(button, unit.Descriptor));
+                unit.UISettings.SetDirty();
+            }
+            foreach (var duplicate in facts.Skip(1))
+            {
+                duplicate.Data.HasActionBarSlot.ReleaseAll();
+                unit.Facts.Remove(duplicate);
+            }
+            return;
+        }
+
+        ClearSelection(unit);
+        RemoveButtonSlots(unit);
+        foreach (var fact in facts)
+        {
+            fact.Data.HasActionBarSlot.ReleaseAll();
+            unit.Facts.Remove(fact);
+        }
+        if (facts.Length > 0) unit.UISettings.SetDirty();
+    }
+
     private static void RemoveButtonSlots(UnitEntityData unit)
     {
         var slots = unit.UISettings.m_Slots;
@@ -247,7 +267,7 @@ internal static class RodCase
         for (var index = 0; index < slots.Length; index++)
         {
             if (slots[index] is MechanicActionBarSlotAbility slot && IsButton(slot.Ability))
-                slots[index] = new MechanicActionBarSlotEmpty { Unit = unit };
+                unit.UISettings.SetSlot(new MechanicActionBarSlotEmpty { Unit = unit }, index);
         }
     }
 }

@@ -43,6 +43,8 @@ internal static class AbilityMenuOrdering
 
         MoveAuraAfterSource(items, Blueprints.ChantAbilityGuid, Blueprints.ChantAuraAbilityGuid);
         MoveAuraAfterSource(items, Blueprints.CackleAbilityGuid, Blueprints.CackleAuraAbilityGuid);
+        foreach (var pair in AutoPerformanceBlueprints.Sources)
+            MoveAuraAfterSource(items, pair.Value, pair.Key);
     }
 
     private static void MoveAuraAfterSource(
@@ -65,6 +67,11 @@ internal static class AbilityMenuOrdering
                 && activatable.ActivatableAbility?.Blueprint.AssetGuid == auraAbilityGuid)
             {
                 auraIndex = index;
+            }
+            else if (slot is MechanicActionBarSlotActivableAbility source
+                && source.ActivatableAbility?.Blueprint.AssetGuid == sourceAbilityGuid)
+            {
+                sourceIndex = index;
             }
         }
 

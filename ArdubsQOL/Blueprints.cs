@@ -175,5 +175,13 @@ internal static class BlueprintsCachePatch
         {
             Main.ModEntry.Logger.Error($"Failed to create the shared Rods menu blueprint: {exception}");
         }
+        try
+        {
+            AutoPerformanceBlueprints.Initialize();
+        }
+        catch (Exception exception)
+        {
+            Main.ModEntry.Logger.Error($"Failed to create automatic performance blueprints: {exception}");
+        }
     }
 }

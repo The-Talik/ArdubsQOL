@@ -6,6 +6,7 @@ Ardub's QOL is a collection of quality-of-life options for
 ## Features
 
 - Chant and Cackle auras. Uses a move action in turn-based combat; caps the caster's speed at 5 feet in real time and outside combat. (Inspired from DarkCodex's version)
+- Auto performance toggles for characters with Lingering Performance: perform for one round, linger for two, and restart using the normal action and resources. Excludes Song of the Fallen, Dance of the Dead, and Blazing Rondo.
 - A Rods submenu in Abilities that pools all metamagic rods.  (Inspired from The One Pearl)
 - Shifter Aspect now retains the remaining minute buff when you turn it off.
 - Shifter Aspects automatically turn off after combat without clearing Chimeric Aspect selections (default on).
@@ -22,6 +23,7 @@ Ardub's QOL is a collection of quality-of-life options for
   retries. (Requires Tabletop Tweaks)
 - An optional rule (default to off) that removes one negative level per level-up.
 - Optional direct control of monsters raised by Repurpose (default off; no ToyBox required).
+- Optional unlock for both weapon slots on the Hag of Gyronna's Night Hag companion (default off). Reload a save to apply.
 - Optional Evil Eye stacking limit: only the strongest penalty per statistic applies, with separate caster durations (default off).
 
 ## Requirements
@@ -42,13 +44,13 @@ implementation is present. All other features work without Tabletop Tweaks.
 
 Most options change only runtime behavior and add no custom save data.
 
-The Chant/Cackle Aura abilities and marker buffs, and the Rods menu ability,
+The Chant/Cackle Aura abilities and marker buffs, Auto performance toggles, and the Rods menu ability,
 are exceptions: their native ability facts and action-bar placements are saved
 so quickbar placement survives loading. Saves containing these ability blueprints require Ardub's QOL.
 
 To uninstalling the mod:
 
-1. Turn off **Enable Chant Aura** and **Shared Rods Menu** in the mod settings.
+1. Turn off **Enable Chant Aura**, **Automatic Lingering Performances**, and **Shared Rods Menu** in the mod settings.
 2. Let the mod remove their abilities and quickbar entries.
 3. Make a new save.
 4. Exit the game and remove the `ArdubsQOL` folder.
@@ -61,6 +63,7 @@ To uninstalling the mod:
 - Tabletop Tweaks Core is optional. Only the Accursed Hex presentation uses it.
 - Chant Aura and Cackle Aura turn off after combat by default. Disable **Stop Chant Auras After Combat** to keep them active.
 - Turns can be delayed while Chant/Cackle Aura remains active, provided no other action has been taken; the resumed turn still reserves its move action.
+- Auto performances keep their quickbar positions, but automation turns off after loading or resting. They stop after combat by default; manual performance controls cancel automation.
 - Rest and world-map travel interrupt Chant and Cackle auras.
 - Ardub's QOL does not require Ardub's Enemy Intelligence, but you might as well give that one a try, too.  ;-)
 

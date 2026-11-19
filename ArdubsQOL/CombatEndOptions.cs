@@ -32,17 +32,23 @@ internal sealed class CombatEndOptions : IPartyCombatHandler
             _wasInCombat,
             inCombat,
             game?.IsLoadingSave == true);
+        var stopAutoPerformances = ShouldStop(
+            Main.Settings.StopAutoPerformancesAfterCombat,
+            _wasInCombat,
+            inCombat,
+            game?.IsLoadingSave == true);
         _wasInCombat = inCombat;
 
         // Loading an out-of-combat save or receiving another non-combat event
         // must not disable an ability that was deliberately enabled while exploring.
-        if ((!stopChantAuras && !stopShifterAspects) || game?.Player == null)
+        if ((!stopChantAuras && !stopShifterAspects && !stopAutoPerformances) || game?.Player == null)
         {
             return;
         }
 
         if (stopChantAuras) StopChantAuras();
         if (stopShifterAspects) StopShifterAspects();
+        if (stopAutoPerformances) AutoPerformance.StopAll();
     }
 
     private static void StopChantAuras()

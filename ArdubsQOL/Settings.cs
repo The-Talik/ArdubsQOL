@@ -14,6 +14,8 @@ public sealed class Settings : UnityModManager.ModSettings
 
     private const string ChantAuraLabel = "Enable Chant Aura (Default On)";
     private const string StopChantAurasLabel = "Stop Chant Auras After Combat (Default On)";
+    private const string AutoPerformancesLabel = "Automatic Lingering Performances (Default On)";
+    private const string StopAutoPerformancesLabel = "Stop Auto Performances After Combat (Default On)";
     private const string ShifterAspectLabel = "Preserve Shifter Aspect Time (Default On)";
     private const string StopShifterAspectsLabel = "Stop Shifter Aspects After Combat (Default On)";
     private const string PauseOnLoadLabel = "Pause at Savegame Load (Default On)";
@@ -27,12 +29,15 @@ public sealed class Settings : UnityModManager.ModSettings
     private const string RodCaseLabel = "Shared Rods Menu (Default On)";
     private const string NegativeLevelLabel = "Remove Negative Level on Level Up (Default Off)";
     private const string RepurposedControlLabel = "Control Repurposed Monsters (Default Off)";
+    private const string NightHagWeaponSlotLabel = "Unlock Night Hag Weapon Slots (Default Off)";
     private const string EvilEyeStackingLabel = "Limit Evil Eye Stacking (Default Off)";
     private const string DiagnosticsLabel = "Detailed Diagnostics (Default Off)";
     private static readonly string[] PlacementChoices = { "Auto", "Left", "Right" };
 
     public bool EnableChantAura = true;
     public bool StopChantAurasAfterCombat = true;
+    public bool EnableAutoPerformances = true;
+    public bool StopAutoPerformancesAfterCombat = true;
     public bool PreserveShifterAspectTime = true;
     public bool StopShifterAspectsAfterCombat = true;
     public bool PauseAtSavegameLoad = true;
@@ -44,6 +49,7 @@ public sealed class Settings : UnityModManager.ModSettings
     public QuickbarTooltipSide QuickbarTooltipPlacement = QuickbarTooltipSide.Auto;
     public bool RemoveNegativeLevelOnLevelUp;
     public bool ControlRepurposedMonsters;
+    public bool UnlockNightHagWeaponSlot;
     public bool LimitEvilEyeStacking;
     public bool EnableRodCase = true;
     public float HoverInspectorFontScale = 1f;
@@ -80,8 +86,8 @@ public sealed class Settings : UnityModManager.ModSettings
             inspectorLabelWidth + InspectorSliderWidth + percentageWidth + OptionColumnGap * 2f + 24f);
         foreach (var name in new[]
         {
-            ChantAuraLabel, StopChantAurasLabel, ShifterAspectLabel, StopShifterAspectsLabel, PauseOnLoadLabel, OutpostLoadingLabel, OutpostSwitcherLabel, InfirmaryPreviewLabel, InfirmaryBreakdownLabel, SideTooltipsLabel,
-            DebuffCastersLabel, HexRetriesLabel, RodCaseLabel, NegativeLevelLabel, RepurposedControlLabel, EvilEyeStackingLabel, DiagnosticsLabel
+            ChantAuraLabel, StopChantAurasLabel, AutoPerformancesLabel, StopAutoPerformancesLabel, ShifterAspectLabel, StopShifterAspectsLabel, PauseOnLoadLabel, OutpostLoadingLabel, OutpostSwitcherLabel, InfirmaryPreviewLabel, InfirmaryBreakdownLabel, SideTooltipsLabel,
+            DebuffCastersLabel, HexRetriesLabel, RodCaseLabel, NegativeLevelLabel, RepurposedControlLabel, NightHagWeaponSlotLabel, EvilEyeStackingLabel, DiagnosticsLabel
         })
         {
             optionColumnWidth = Mathf.Max(optionColumnWidth, MeasureWidth(GUI.skin.toggle, name));
@@ -98,6 +104,16 @@ public sealed class Settings : UnityModManager.ModSettings
                 StopChantAurasAfterCombat,
                 StopChantAurasLabel,
                 "Automatically turns off Chant and Cackle auras when the party leaves combat.",
+                descriptionStyle, optionColumnWidth);
+            EnableAutoPerformances = DrawToggleRow(
+                EnableAutoPerformances,
+                AutoPerformancesLabel,
+                "Adds Auto toggles for eligible performances with Lingering Performance: one paid round, two lingering rounds, then a normal-cost restart.",
+                descriptionStyle, optionColumnWidth);
+            StopAutoPerformancesAfterCombat = DrawToggleRow(
+                StopAutoPerformancesAfterCombat,
+                StopAutoPerformancesLabel,
+                "Turns off automatic performances when the party leaves combat.",
                 descriptionStyle, optionColumnWidth);
             PreserveShifterAspectTime = DrawToggleRow(
                 PreserveShifterAspectTime,
@@ -202,6 +218,11 @@ public sealed class Settings : UnityModManager.ModSettings
                 RepurposedControlLabel,
                 "Lets you directly control monsters raised by a party member's Repurpose without changing their summon status or lifespan.",
                 descriptionStyle, optionColumnWidth);
+            UnlockNightHagWeaponSlot = DrawToggleRow(
+                UnlockNightHagWeaponSlot,
+                NightHagWeaponSlotLabel,
+                "Unlocks both weapon slots on the Hag of Gyronna's Night Hag companion. Reload a save to apply.",
+                descriptionStyle, optionColumnWidth);
             EnableRodCase = DrawToggleRow(
                 EnableRodCase,
                 RodCaseLabel,
@@ -219,7 +240,7 @@ public sealed class Settings : UnityModManager.ModSettings
             DetailedLogging = DrawToggleRow(
                 DetailedLogging,
                 DiagnosticsLabel,
-                "Writes detailed aura, Shifter Aspect, outpost loading, shared rod charge, and negative-level recovery diagnostics to the UMM log.",
+                "Writes detailed aura, automatic performance, Shifter Aspect, outpost loading, shared rod charge, and negative-level recovery diagnostics to the UMM log.",
                 descriptionStyle, optionColumnWidth);
         }, headingStyle, headingWidth);
     }

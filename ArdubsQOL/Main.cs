@@ -30,6 +30,7 @@ public static class Main
                 RodCase.Update();
                 OutpostNavigation.Update();
                 EvilEyeStacking.Update();
+                AutoPerformance.Update();
             };
 
             new Harmony(modEntry.Info.Id).PatchAll(Assembly.GetExecutingAssembly());
